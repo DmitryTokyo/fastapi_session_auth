@@ -35,20 +35,14 @@ async def prepare_database(event_loop) -> AsyncGenerator:
 
 @pytest_asyncio.fixture(scope='module')
 async def test_session(prepare_database, event_loop) -> AsyncGenerator:
-    logger.info("Starting test session...")
     async with AsyncSessionFactory() as session:
-        logger.info("Session started successfully.")
         yield session
-        logger.info("Test completed, rolling back any transactions...")
         await session.rollback()
-        logger.info("Transactions rolled back.")
         await session.close()
-        logger.info("Session closed.")
 
 
 @pytest.fixture(scope='module', autouse=True)
 def event_loop() -> Generator:
     loop = asyncio.get_event_loop_policy().new_event_loop()
-    loop.__original_fixture_loop = True
     yield loop
     loop.close()

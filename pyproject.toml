@@ -91,4 +91,3 @@ pythonpath = [
 ]
 norecursedirs = ".mypy_cache .pytest_cache migrations"
 filterwarnings = "ignore::DeprecationWarning"
-asyncio_mode = "auto"
