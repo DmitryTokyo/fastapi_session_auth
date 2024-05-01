@@ -1,0 +1,7 @@
+.idea
+
+.envrc
+
+*.json
+
+**/__pycache__/
