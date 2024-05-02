@@ -12,4 +12,3 @@ class UserFactory(BaseFactory):
     username = factory.Faker('name')
     hashed_password = factory.Faker('password')
     email = factory.Faker('email')
-

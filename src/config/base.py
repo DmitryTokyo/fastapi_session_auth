@@ -17,7 +17,7 @@ class Base(BaseSettings):
     HASH_ALGORITHM: str = 'HS256'
 
     DB_URL: str = os.getenv('DB_URL', default='sqlite:///sqlite3.db')
-    TEST_DB_URL: str = os.getenv('TEST_DB_URL', default='sqlite+aiosqlite:///:memory:')
+    TEST_DB_URL: str = os.getenv('TEST_DB_URL', default='sqlite+aiosqlite:///test_db.db')
     BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = [
         'http://localhost',
         'http://localhost:8000',

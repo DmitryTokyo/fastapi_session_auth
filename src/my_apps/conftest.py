@@ -1,11 +1,8 @@
-import asyncio
 from asyncio import current_task
 import logging
-from typing import AsyncGenerator, Generator
+from typing import AsyncGenerator
 
-import pytest
 import pytest_asyncio
-from pytest_asyncio import is_async_test
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, async_scoped_session
 
 from src.config.base import settings
@@ -13,7 +10,7 @@ from src.db.db_init import Base
 
 logger = logging.getLogger(__name__)
 
-test_engine = create_async_engine("sqlite+aiosqlite:///my_temp_db.db", echo=False)
+test_engine = create_async_engine(settings.TEST_DB_URL, echo=False)
 AsyncSessionFactory = async_sessionmaker(
     test_engine,
     class_=AsyncSession,
@@ -27,7 +24,6 @@ async_sc_session = async_scoped_session(AsyncSessionFactory, scopefunc=current_t
 @pytest_asyncio.fixture
 async def test_db_engine():
     async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
         await conn.commit()
     yield test_engine
@@ -42,4 +38,3 @@ async def test_session(test_db_engine) -> AsyncGenerator:
         yield session
         await session.rollback()
         await session.close()
-

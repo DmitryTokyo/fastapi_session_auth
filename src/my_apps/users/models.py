@@ -17,7 +17,7 @@ class User(Base):
     def __repr__(self) -> str:
         return self.username
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, User):
             return self.id == other.id
         return False
