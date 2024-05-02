@@ -6,6 +6,7 @@ from src.my_apps.users.schemas import UserRegistrate, UserUpdateDB
 
 pytestmark = pytest.mark.asyncio
 
+
 async def test_get_user_by_email(test_session, user_factory):
     user = await user_factory()
     exist_user = await crud_user.get_by_email(db_session=test_session, email=user.email)
