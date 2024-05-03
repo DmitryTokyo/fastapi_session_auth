@@ -1,8 +1,9 @@
 import pytest
 from fastapi.security import OAuth2PasswordRequestForm
 
-from src.my_apps.users.auth.authentication import authenticate_user
+from src.my_apps.users.auth.authentication import authenticate_user, get_current_user
 from src.my_apps.users.auth.custom_types import AuthenticationResult
+from src.my_apps.users.auth.exceptions import NotAuthenticatedException
 from src.my_apps.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.asyncio
@@ -27,3 +28,23 @@ async def test_authenticate_user(
     )
     auth_result = await authenticate_user(db_session=test_session, credentials=credentials)
     assert auth_result == expected
+
+
+async def test_get_current_user_successfully(test_session, mocker, user_factory):
+    user = await user_factory()
+    mock_request = mocker.Mock(session={'user_id': user.id})
+    current_user = await get_current_user(request=mock_request, db_session=test_session)
+    assert current_user == user
+
+
+@pytest.mark.parametrize(
+    'user_id',
+    [
+        -1, None,
+    ],
+)
+async def test_get_current_user_unsuccessfully(test_session, mocker, user_factory, user_id):
+    mock_request = mocker.Mock(session={'user_id': user_id})
+    with pytest.raises(NotAuthenticatedException):
+        current_user = await get_current_user(request=mock_request, db_session=test_session)
+        assert current_user is None
