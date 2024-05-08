@@ -1,12 +1,15 @@
 from asyncio import current_task
 import logging
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Generator
 
+import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession, async_scoped_session
+from starlette.testclient import TestClient
 
 from src.config.base import settings
 from src.db.db_init import Base
+from src.server import app
 
 logger = logging.getLogger(__name__)
 
@@ -38,3 +41,13 @@ async def test_session(test_db_engine) -> AsyncGenerator:
         yield session
         await session.rollback()
         await session.close()
+
+
+@pytest.fixture(scope='module')
+def test_server_url() -> str:
+    return 'http://fast-api-test-server'
+
+
+@pytest.fixture(scope='module')
+def client(test_server_url: str) -> Generator:
+    yield TestClient(app, base_url=test_server_url, follow_redirects=False)
