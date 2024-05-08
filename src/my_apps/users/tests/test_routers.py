@@ -1,8 +1,10 @@
 import pytest
+from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 from starlette.datastructures import URL
 
 from src.db.db_deps import get_session
+from src.my_apps.users.auth.custom_types import AuthenticationResult
 from src.my_apps.users.auth.forms import register_user_form
 from src.my_apps.users.crud import crud_user
 from src.my_apps.users.schemas import UserRegistrate
@@ -44,3 +46,32 @@ async def test_signup_new_user(client, test_server_url, test_session):
     user = await crud_user.get_by_email(db_session=test_session, email='new@test.com')
     assert response.status_code == status.HTTP_302_FOUND
     assert user is not None
+
+
+async def test_show_signin_form(client, test_server_url):
+    response = client.get('/signin')
+    assert response.status_code == status.HTTP_200_OK
+    assert URL(f'{test_server_url}/signin') == response.url
+
+
+@pytest.mark.parametrize(
+    'signin_email, verify_password_result, expected_status',
+    [
+        ('exist@test.com', True, status.HTTP_302_FOUND),
+        ('exist@test.com', False, status.HTTP_401_UNAUTHORIZED),
+        ('non_exist@test.com', False, status.HTTP_401_UNAUTHORIZED),
+    ],
+)
+async def test_signin_user(
+    client, test_server_url, test_session, mocker, verify_password_result, expected_status, signin_email,
+):
+    await UserFactory(username='exist username', hashed_password='hashed_password', email='exist@test.com')
+    mocker.patch(
+        'src.my_apps.users.auth.authentication.verify_password',
+        return_value=verify_password_result,
+    )
+    oauth2_mock_form = OAuth2PasswordRequestForm(username=signin_email, password='password')
+    app.dependency_overrides[OAuth2PasswordRequestForm] = lambda: oauth2_mock_form
+    app.dependency_overrides[get_session] = lambda: test_session
+    response = client.post('/signin', data={'username': 'exist username', 'password': 'password'})
+    assert response.status_code == expected_status
