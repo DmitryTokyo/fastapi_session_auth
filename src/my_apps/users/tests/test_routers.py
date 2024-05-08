@@ -75,3 +75,9 @@ async def test_signin_user(
     app.dependency_overrides[get_session] = lambda: test_session
     response = client.post('/signin', data={'username': 'exist username', 'password': 'password'})
     assert response.status_code == expected_status
+
+
+async def test_logout(client, test_server_url):
+    response = client.post('/logout')
+    assert response.status_code == status.HTTP_302_FOUND
+    assert URL(f'{test_server_url}/logout') == response.url
