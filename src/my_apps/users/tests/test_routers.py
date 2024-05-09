@@ -4,7 +4,6 @@ from starlette import status
 from starlette.datastructures import URL
 
 from src.db.db_deps import get_session
-from src.my_apps.users.auth.custom_types import AuthenticationResult
 from src.my_apps.users.auth.forms import register_user_form
 from src.my_apps.users.crud import crud_user
 from src.my_apps.users.schemas import UserRegistrate
