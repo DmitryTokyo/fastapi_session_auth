@@ -4,6 +4,9 @@
 {% block content %}
   <div id="signin-form-wrapper" class="d-flex justify-content-center align-items-center vh-100">
     <div class="card bg-light p-5 w-30-em">
+      {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+      {% endif %}
       <form action="{{ url_for('signin') }}" method="post">
         <h1 class="h3 mb-3 fw-normal">Sign in</h1>
         <div class="form-floating mb-5">

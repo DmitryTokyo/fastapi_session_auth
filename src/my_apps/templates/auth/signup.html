@@ -4,6 +4,9 @@
 {% block content %}
   <div class="d-flex justify-content-center align-items-center vh-100">
     <div class="card bg-light p-5 w-30-em">
+      {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+      {% endif %}
       <form id="signup-form" action="{{ url_for('registrate_user') }}" method="post">
         <h1 class="h3 mb-3 fw-normal">Sign up</h1>
         <div class="form-floating mb-5">

@@ -28,15 +28,17 @@ async def registrate_user(
     request: Request,
     user_registrate_schema: Annotated[UserRegistrate, Depends(register_user_form)],
     db_session: AsyncSession = Depends(get_session),
+    templates: Jinja2Templates = Depends(get_templates),
 ):
     existing_user = await crud_user.get_by_email(
         db_session=db_session,
         email=user_registrate_schema.email,
     )
     if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f'User with email: {user_registrate_schema.email} already exists',
+        return templates.TemplateResponse(
+            name='auth/signup.html',
+            request=request,
+            context={'error': f'User with email: {user_registrate_schema.email} already exists'},
         )
     user = await crud_user.create_user(db_session=db_session, user_registrate_schema=user_registrate_schema)
     request.session.clear()
@@ -57,12 +59,14 @@ async def signin(
     request: Request,
     credentials: OAuth2PasswordRequestForm = Depends(),
     db_session: AsyncSession = Depends(get_session),
+    templates: Jinja2Templates = Depends(get_templates),
 ):
     user_auth_result = await authenticate_user(credentials=credentials, db_session=db_session)
     if user_auth_result.user is None or not user_auth_result.is_authenticated:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Incorrect email or password',
+        return templates.TemplateResponse(
+            name='auth/signin.html',
+            request=request,
+            context={'error': 'Incorrect email or password'},
         )
     request.session.clear()
     request.session['user_id'] = user_auth_result.user.id
