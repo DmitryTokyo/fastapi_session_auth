@@ -8,4 +8,27 @@
 {% endblock %}
 
 {% block content %}
+  <div class="d-flex flex-column mt-5 mb-5">
+    <h3 class="mb-3">Check form submit</h3>
+    <form hx-post="{{ url_for('load_form_data') }}" hx-target="#submission-results" hx-swap="beforeend" hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'>
+      <label for="my-selection">Choose a selection:</label>
+      <select id="my-selection" class="form-control mb-3" name="selection">
+        <option value="">------</option>
+        <option value="first">First select</option>
+        <option value="second">Second select</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+  <div>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Datetime of submission</th>
+          <th scope="col">Result of submission</th>
+        </tr>
+      </thead>
+      <tbody id="submission-results"></tbody>
+    </table>
+  </div>
 {% endblock %}

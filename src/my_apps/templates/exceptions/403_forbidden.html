@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block extra_nav_bar %}
+  <form class="text-end" action="{{ url_for('logout') }}" method="post">
+    <button type="submit" class="btn btn-outline-primary">Logout</button>
+  </form>
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="alert alert-danger" role="alert">
+      <h4 class="alert-heading">403 Forbidden</h4>
+      <p>Access to this resource is denied. Please check your permissions and try again. If you believe this is a mistake, contact our technical support team.</p>
+      <hr>
+      <p class="mb-0">Error Code: 403</p>
+    </div>
+    <div class="d-flex justify-content-center mt-3">
+      <a href="{{ url_for('base') }}" class="btn btn-primary">Return to Home</a>
+    </div>
+  </div>
+{% endblock %}

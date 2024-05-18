@@ -1,4 +1,6 @@
 from fastapi import FastAPI, Request, Depends
+from fastapi_csrf_protect import CsrfProtect
+from fastapi_csrf_protect.exceptions import CsrfProtectError
 from sqladmin import Admin
 from starlette import status
 from starlette.middleware import Middleware
@@ -11,10 +13,13 @@ from src.admin.admin import AdminAuth, UserAdmin
 from src.config.base import settings
 from src.db.db_init import engine
 from src.my_apps.app.routers import router as app_router
+from src.my_apps.base_schema import CsrfSettings
 from src.my_apps.users.auth.authentication import not_authenticated_exception_handler, get_current_user
 from src.my_apps.users.auth.exceptions import NotAuthenticatedException
 from src.my_apps.users.auth.routers import router as auth_router
 from src.my_apps.users.models import User
+from src.my_apps.exceptions_handler import router as exception_router
+from src.my_apps.exceptions_handler import csrf_protect_exception_handler
 
 middlewares = [
     Middleware(
@@ -49,7 +54,14 @@ async def base(
     return RedirectResponse(url=request.url_for('my_app_page'), status_code=status.HTTP_302_FOUND)
 
 
+@CsrfProtect.load_config
+def get_csrf_config() -> CsrfSettings:
+    return CsrfSettings(secret_key=settings.SECRET_KEY)
+
+
 app.include_router(app_router)
 app.include_router(auth_router)
+app.include_router(exception_router)
+app.add_exception_handler(CsrfProtectError, csrf_protect_exception_handler)
 
 admin.add_view(UserAdmin)
