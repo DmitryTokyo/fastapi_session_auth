@@ -9,7 +9,11 @@ pytestmark = pytest.mark.asyncio
 
 async def test_get_user_by_email(test_session, user_factory):
     user = await user_factory()
-    exist_user = await crud_user.get_by_email(db_session=test_session, email=user.email)
+    exist_user = await crud_user.get_single(
+        db_session=test_session,
+        field='email',
+        value=user.email,
+    )
     assert exist_user.email == user.email
 
 
@@ -25,13 +29,13 @@ async def test_creating_user(test_session, mocker):
 async def test_deleting_user(test_session, user_factory):
     user = await user_factory()
     await crud_user.delete(db_session=test_session, obj_id=user.id)
-    exist_user = await crud_user.get_single(db_session=test_session, obj_id=user.id)
+    exist_user = await crud_user.get_single(db_session=test_session, field='id', value=user.id)
     assert exist_user is None
 
 
 async def test_get_user_by_id(test_session, user_factory):
     user = await user_factory()
-    exist_user = await crud_user.get_single(db_session=test_session, obj_id=user.id)
+    exist_user = await crud_user.get_single(db_session=test_session, field='id', value=user.id)
     assert exist_user.id == user.id
     assert exist_user.email == user.email
 

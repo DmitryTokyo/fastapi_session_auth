@@ -26,7 +26,12 @@ async def test_authenticate_user(
         user=user if is_user_expected else None,
         is_authenticated=is_authenticated_expected,
     )
-    auth_result = await authenticate_user(db_session=test_session, credentials=credentials)
+    auth_result = await authenticate_user(
+        db_session=test_session,
+        credentials=credentials,
+        authenticate_by_field='email',
+        authenticate_field_value=credentials.username,
+    )
     assert auth_result == expected
 
 

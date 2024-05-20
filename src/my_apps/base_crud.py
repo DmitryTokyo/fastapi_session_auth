@@ -31,8 +31,13 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db_execution = await db_session.execute(stmt)
         return db_execution.scalar_one_or_none()
 
-    async def get_single(self, db_session: AsyncSession, obj_id: int) -> ModelType:
-        stmt = select(self.model).where(self.model.id == obj_id)
+    async def get_single(
+        self,
+        db_session: AsyncSession,
+        field: str,
+        value: str | int,
+    ) -> ModelType:
+        stmt = select(self.model).where(getattr(self.model, field) == value)
         db_execution = await db_session.execute(stmt)
         return db_execution.scalar_one_or_none()
 

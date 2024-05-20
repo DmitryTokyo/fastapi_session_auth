@@ -14,8 +14,17 @@ from src.my_apps.users.crud import crud_user
 from src.my_apps.users.models import User
 
 
-async def authenticate_user(db_session: AsyncSession, credentials: OAuth2PasswordRequestForm) -> AuthenticationResult:
-    user = await crud_user.get_by_email(db_session=db_session, email=credentials.username)
+async def authenticate_user(
+    db_session: AsyncSession,
+    credentials: OAuth2PasswordRequestForm,
+    authenticate_by_field: str,
+    authenticate_field_value: str | int,
+) -> AuthenticationResult:
+    user = await crud_user.get_single(
+        db_session=db_session,
+        field=authenticate_by_field,
+        value=authenticate_field_value,
+    )
     if not user:
         return AuthenticationResult(user=None, is_authenticated=False)
     if not verify_password(credentials.password, user.hashed_password):
@@ -28,7 +37,7 @@ async def get_current_user(request: Request, db_session: AsyncSession = Depends(
     user_id = request.session.get('user_id')
     if user_id is None:
         raise NotAuthenticatedException(status_code=status.HTTP_403_FORBIDDEN)
-    user = await crud_user.get_single(db_session=db_session, obj_id=user_id)
+    user = await crud_user.get_single(db_session=db_session, field='id', value=user_id)
     if user is None:
         raise NotAuthenticatedException(status_code=status.HTTP_403_FORBIDDEN)
     return user

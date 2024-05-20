@@ -13,7 +13,7 @@ from src.my_apps.users.models import User
 router = APIRouter(tags=['app'])
 
 
-@router.get('/app', response_class=HTMLResponse)
+@router.get('/app', response_class=HTMLResponse, name='my_app_page')
 async def my_app_page(
     request: Request,
     templates: Jinja2Templates = Depends(get_templates),

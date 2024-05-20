@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -18,7 +18,7 @@ from src.my_apps.users.schemas import UserRegistrate
 router = APIRouter(tags=['users/auth'])
 
 
-@router.get('/signup', response_class=HTMLResponse, status_code=status.HTTP_200_OK)
+@router.get('/signup', response_class=HTMLResponse, status_code=status.HTTP_200_OK, name='show_signup_form')
 async def show_signup_form(request: Request, templates: Jinja2Templates = Depends(get_templates)):
     return templates.TemplateResponse(request=request, name='auth/signup.html')
 
@@ -30,12 +30,14 @@ async def registrate_user(
     db_session: AsyncSession = Depends(get_session),
     templates: Jinja2Templates = Depends(get_templates),
 ):
-    existing_user = await crud_user.get_by_email(
+    existing_user = await crud_user.get_single(
         db_session=db_session,
-        email=user_registrate_schema.email,
+        field='email',
+        value=user_registrate_schema.email,
     )
     if existing_user:
         return templates.TemplateResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
             name='auth/signup.html',
             request=request,
             context={'error': f'User with email: {user_registrate_schema.email} already exists'},
@@ -46,7 +48,7 @@ async def registrate_user(
     return RedirectResponse(url=request.url_for('my_app_page'), status_code=status.HTTP_302_FOUND)
 
 
-@router.get('/signin', response_class=HTMLResponse)
+@router.get('/signin', response_class=HTMLResponse, name='show_signin_form')
 async def show_signin_form(
     request: Request,
     templates: Jinja2Templates = Depends(get_templates),
@@ -61,12 +63,18 @@ async def signin(
     db_session: AsyncSession = Depends(get_session),
     templates: Jinja2Templates = Depends(get_templates),
 ):
-    user_auth_result = await authenticate_user(credentials=credentials, db_session=db_session)
+    user_auth_result = await authenticate_user(
+        credentials=credentials,
+        db_session=db_session,
+        authenticate_by_field='email',
+        authenticate_field_value=credentials.username,
+    )
     if user_auth_result.user is None or not user_auth_result.is_authenticated:
         return templates.TemplateResponse(
             name='auth/signin.html',
             request=request,
             context={'error': 'Incorrect email or password'},
+            status_code=status.HTTP_401_UNAUTHORIZED,
         )
     request.session.clear()
     request.session['user_id'] = user_auth_result.user.id
@@ -78,4 +86,4 @@ async def logout(
     request: Request,
 ):
     request.session.clear()
-    return RedirectResponse(url=request.url_for('show_signin_form'), status_code=status.HTTP_302_FOUND)
+    return RedirectResponse(url=router.url_path_for('show_signin_form'), status_code=status.HTTP_302_FOUND)
