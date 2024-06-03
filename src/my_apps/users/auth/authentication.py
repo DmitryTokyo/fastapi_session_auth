@@ -1,5 +1,4 @@
 from fastapi import Depends
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.requests import Request
@@ -16,7 +15,7 @@ from src.my_apps.users.models import User
 
 async def authenticate_user(
     db_session: AsyncSession,
-    credentials: OAuth2PasswordRequestForm,
+    password: str,
     authenticate_by_field: str,
     authenticate_field_value: str | int,
 ) -> AuthenticationResult:
@@ -27,7 +26,7 @@ async def authenticate_user(
     )
     if not user:
         return AuthenticationResult(user=None, is_authenticated=False)
-    if not verify_password(credentials.password, user.hashed_password):
+    if not verify_password(password, user.hashed_password):
         return AuthenticationResult(user=None, is_authenticated=False)
 
     return AuthenticationResult(user=user, is_authenticated=True)
