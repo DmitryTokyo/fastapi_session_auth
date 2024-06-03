@@ -64,7 +64,7 @@ async def signin(
     templates: Jinja2Templates = Depends(get_templates),
 ):
     user_auth_result = await authenticate_user(
-        credentials=credentials,
+        password=credentials.password,
         db_session=db_session,
         authenticate_by_field='email',
         authenticate_field_value=credentials.username,
