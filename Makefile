@@ -2,7 +2,7 @@ migrate:
 	alembic upgrade head
 
 runserver:
-	uvicorn src.server:app --reload --port 8000
+	uvicorn src.server:app --reload --port 5000
 
 ipython:
 	ipython -i ipython_startup.py
