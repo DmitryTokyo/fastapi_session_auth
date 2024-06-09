@@ -32,3 +32,9 @@ make runserver
 docker build -t fastapi-app:latest .
 docker run -d -p 8000:5000 fastapi-app
 ```
+
+## Interactive Shell
+You can interact with the objects and application logic using an IPython shell. To start the IPython shell, use the following command:
+```shell
+make ipython
+```
