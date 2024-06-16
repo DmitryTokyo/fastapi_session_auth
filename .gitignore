@@ -1,6 +1,7 @@
 .idea
 
 .envrc
+.env
 
 *.json
 

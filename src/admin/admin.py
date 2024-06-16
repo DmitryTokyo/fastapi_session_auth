@@ -44,7 +44,7 @@ class AdminAuth(AuthenticationBackend):
         if not user_id:
             return False
         try:
-            jwt.decode(admin_token, settings.SECRET_KEY, algorithms=settings.HASH_ALGORITHM)
+            jwt.decode(admin_token, settings.secret_key, algorithms=settings.hash_algorithm)
         except (jwt.ExpiredSignatureError, jwt.DecodeError):
             return False
         admin_jwt_token = _generate_admin_jwt_token(user_id=user_id)
@@ -54,11 +54,11 @@ class AdminAuth(AuthenticationBackend):
 
 def _generate_admin_jwt_token(user_id: int) -> str:
     expiration_datetime = (
-        datetime.now(tz=timezone.utc) + timedelta(seconds=settings.ADMIN_SESSION_EXPIRATION_SECONDS)
+        datetime.now(tz=timezone.utc) + timedelta(seconds=settings.admin_session_expiration_seconds)
     )
     admin_jwt_token = jwt.encode(
         {'admin_user_id': user_id, 'exp': expiration_datetime},
-        settings.SECRET_KEY,
-        algorithm=settings.HASH_ALGORITHM,
+        settings.secret_key,
+        algorithm=settings.hash_algorithm,
     )
     return admin_jwt_token

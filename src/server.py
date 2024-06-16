@@ -24,20 +24,20 @@ from src.my_apps.exceptions_handler import csrf_protect_exception_handler
 middlewares = [
     Middleware(
         CORSMiddleware,
-        allow_origins=settings.BACKEND_CORS_ORIGINS,
+        allow_origins=settings.backend_cors_origins,
         allow_credentials=True,
         allow_methods=['*'],
         allow_headers=['*'],
     ),
-    Middleware(SessionMiddleware, secret_key=settings.SECRET_KEY, https_only=True),
+    Middleware(SessionMiddleware, secret_key=settings.secret_key, https_only=True),
 ]
 
-app = FastAPI(openapi_url=settings.OPENAPI_URL, middleware=middlewares)
+app = FastAPI(openapi_url=settings.openapi_url, middleware=middlewares)
 app.add_exception_handler(NotAuthenticatedException, not_authenticated_exception_handler)
 
 app.mount('/static', StaticFiles(directory='src/my_apps/static'), name='static')
 
-authentication_backend = AdminAuth(secret_key=settings.SECRET_KEY)
+authentication_backend = AdminAuth(secret_key=settings.secret_key)
 admin = Admin(app=app, engine=engine, authentication_backend=authentication_backend)
 
 
@@ -56,7 +56,7 @@ async def base(
 
 @CsrfProtect.load_config
 def get_csrf_config() -> CsrfSettings:
-    return CsrfSettings(secret_key=settings.SECRET_KEY)
+    return CsrfSettings(secret_key=settings.secret_key)
 
 
 app.include_router(app_router)

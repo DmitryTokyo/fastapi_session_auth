@@ -10,7 +10,7 @@ from src.my_apps.users.models import User
 
 
 def get_templates() -> Jinja2Templates:
-    return Jinja2Templates(directory=settings.TEMPLATES_ROOT)
+    return Jinja2Templates(directory=settings.templates_root)
 
 
 def get_current_user(request: Request, session: AsyncSession = Depends(get_session)) -> User | None:

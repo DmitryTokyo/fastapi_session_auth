@@ -13,7 +13,7 @@ from src.server import app
 
 logger = logging.getLogger(__name__)
 
-test_engine = create_async_engine(settings.TEST_DB_URL, echo=False)
+test_engine = create_async_engine(settings.test_db_url, echo=False)
 AsyncSessionFactory = async_sessionmaker(
     test_engine,
     class_=AsyncSession,

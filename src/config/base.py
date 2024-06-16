@@ -1,32 +1,32 @@
 import os
-import secrets
 from pathlib import Path
 from typing import ClassVar
 
 from pydantic import AnyHttpUrl
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Base(BaseSettings):
-    DEV: bool = os.environ.get('DEV', default=False) is True
-    PROJECT_NAME: str = 'Grab my bills'
-    BACKEND_DIR: ClassVar = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    ROOT_DIR: ClassVar = os.path.dirname(BACKEND_DIR)
-    OPENAPI_URL: str = '/openapi_schema.json'
-    SECRET_KEY: str = os.environ.get('SECRET_KEY', default=secrets.token_urlsafe(32))
-    HASH_ALGORITHM: str = 'HS256'
-    ADMIN_SESSION_EXPIRATION_SECONDS: int = 60 * 60 * 24
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
+    dev: bool = False
+    project_name: str = 'Grab my bills'
+    backend_dir: ClassVar = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    root_dir: ClassVar = os.path.dirname(backend_dir)
+    openapi_url: str = '/openapi_schema.json'
+    secret_key: str = 'secret_key'
+    hash_algorithm: str = 'HS256'
+    admin_session_expiration_seconds: int = 60 * 60 * 24
 
-    DB_URL: str = os.getenv('DB_URL', default='sqlite+aiosqlite:///sqlite3.db')
-    TEST_DB_URL: str = os.getenv('TEST_DB_URL', default='sqlite+aiosqlite:///test_db.db')
-    BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = [
+    db_url: str = 'sqlite+aiosqlite:///sqlite3.db'
+    test_db_url: str = 'sqlite+aiosqlite:///test_db.db'
+    backend_cors_origins: list[AnyHttpUrl] = [
         'http://localhost',
         'http://localhost:8000',
         'http://127.0.0.1:8000',
         'http://127.0.0.1',
     ]
-    TEMPLATES_ROOT: Path = Path('src/my_apps') / 'templates'
-    MEDIA_ROOT: str = f'{BACKEND_DIR}/media/'
+    templates_root: Path = Path('src/my_apps') / 'templates'
+    media_root: str = f'{backend_dir}/media/'
 
 
-settings = Base()
+settings = Settings()
