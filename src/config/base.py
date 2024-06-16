@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
+    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8', extra='ignore')
     dev: bool = False
     project_name: str = 'Grab my bills'
     backend_dir: ClassVar = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
