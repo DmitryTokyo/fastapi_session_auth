@@ -27,12 +27,32 @@ You can start application by command:
 make runserver
 ```
 
-### Using docker
+### Using Docker
+
+At first, you need to create a `.env` file in the root directory of your project with the following variables:
+
+```plaintext
+SECRET_KEY=your_secret_key
+DB_URL=your_database_url
+DEV=True
+POSTGRES_USER=your_postgres_user
+POSTGRES_PASSWORD=your_postgres_password
+POSTGRES_DB=your_postgres_db
+```
+
+1. Use bash script (docker-compose inside)
+```shell
+chmod +x run.sh
+```
+and then
+```shell
+./run.sh
+```
+2. Use Docker CLI
 ```shell
 docker build -t fastapi-app:latest .
 docker run -d -p 8000:5000 fastapi-app
 ```
-
 ## Interactive Shell
 You can interact with the objects and application logic using an IPython shell. To start the IPython shell, use the following command:
 ```shell
